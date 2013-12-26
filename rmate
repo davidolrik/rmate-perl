@@ -1,0 +1,173 @@
+#!/usr/bin/env perl
+
+use 5.10.1;
+use strict;
+use warnings;
+
+use Cwd qw[abs_path];
+use POSIX qw(setsid);
+use Getopt::Long;
+use IO::Socket;
+use Pod::Usage;
+use Sys::Hostname;
+
+use version 0.77;
+my $VERSION = qv("v1.0.0");
+
+$SIG{HUP} = "IGNORE";
+
+# Setup defaults
+my $action_man     = 0;
+my $action_help    = 0;
+my $action_version = 0;
+my $host           = 'localhost';
+my $port           = 52698;
+my $force          = 0;
+my $wait           = 0;
+my $verbose        = 0;
+
+# TODO Read configuration from file
+
+# Override with options from commandline
+GetOptions(
+    'help'     => \$action_help,
+    'man'      => \$action_man,
+    'version'  => \$action_version,
+    'host'     => \$host,
+    'port=i'   => \$port,
+    'force'    => \$force,
+    'wait!'    => \$wait,
+    'verbose+' => \$verbose,
+) or pod2usage(2);
+pod2usage(1) if $action_help;
+pod2usage(-exitval => 0, -verbose => 2) if $action_man;
+
+if ( $action_version ) {
+    print "$0 $VERSION\n";
+    exit 0;
+}
+
+# Get filename from args
+my $filename = shift @ARGV;
+die unless $filename;
+
+# Open socket
+my $socket = IO::Socket::INET->new(
+    PeerHost => $host,
+    PeerPort => $port,
+    Proto    => 'tcp',
+);
+
+# Read server into (which is always the first line)
+my $server_info = $socket->getline;
+chomp($server_info);
+say $server_info if $verbose;
+
+# Compute what is shown in the tab, and the absolute path to the file
+my $displayname = sprintf("%s:%s", hostname, $filename);
+my $abspath = abs_path($filename);
+
+# Initialize editor with contents from file
+$socket->print("open\n");
+$socket->print("display-name: ${displayname}\n");
+$socket->print("real-path: ${abspath}\n");
+$socket->print("data-on-save: yes\n");
+$socket->print("re-activate: yes\n");
+$socket->print("token: ${filename}\n");
+
+my $filetype;
+if ( $filetype ) {
+    $socket->print("file-type: ${filetype}\n");
+}
+
+# Fetch file contents if the file exists
+my $filesize = -s $filename // 0;
+$socket->print("data: ${filesize}\n");
+if ( $filesize > 0 ) {
+    open(my $fh, '<', $abspath);
+    while ( my $line = <$fh> ) {
+        $socket->print($line);
+    }
+    close($fh);
+}
+$socket->print("\n.\n");
+
+# Detatch from terminal
+unless ( $wait ) {
+    open(STDIN,  "<", "/dev/null")  || die "Unable to read /dev/null: $!";
+    open(STDOUT, ">", "/dev/null")  || die "Unable to write to /dev/null: $!";
+    defined(my $child_pid = fork()) || die "Unable to fork: $!";
+    # Exit parent process
+    exit if $child_pid;
+    (setsid() != -1)                || die "Unable to start a new session: $!";
+    open(STDERR, ">&STDOUT")        || die "Unable to dup stdout: $!";
+}
+
+# Enter save loop until buffer is closed in editor
+while ( my $command = $socket->getline ) {
+    chomp($command);
+
+    # Read commands
+    my $data = "";
+    my $options = {};
+    while ( my $line = $socket->getline ) {
+        chomp($line);
+        last unless $line;
+
+        my ($name, $value) = split(/:\s*/, $line, 2);
+        $options->{$name} = $value;
+        if ( $name eq 'data' ) {
+            $socket->read($data, $value);
+        }
+    }
+
+    # Process commands
+    if ( $command eq 'save'  ) {
+        say "Save $filename" if $verbose;
+        my $mode = ( -f $filename ) ? (stat($filename))[2] & 07777 : undef;
+        open(my $fh, '>', $filename.'-'.$$);
+        $fh->print($data);
+        close($fh);
+        rename($filename.'-'.$$, $filename);
+        chmod($mode, $filename) if $mode;
+    }
+    elsif ( $command eq 'close' ) {
+        say "Close $filename" if $verbose;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+sample - Using Getopt::Long and Pod::Usage
+
+=head1 SYNOPSIS
+
+rmate [options] [file ...]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the given input file(s) and do something
+
+useful with the contents thereof.
+
+=cut
