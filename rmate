@@ -26,7 +26,21 @@ my $force          = 0;
 my $wait           = 0;
 my $verbose        = 0;
 
-# TODO Read configuration from file
+# Read configuration from file
+my $config = {};
+foreach my $configfile ( '/etc/rmate.rc', "$ENV{HOME}/.rmate.rc" ) {
+    if ( -e $configfile ) {
+        open(my $fh, '<', $configfile);
+        while ( my $line = <$fh> ) {
+            if ( my ($key,$value) = $line =~ /(\w+):\s*(.+)/ ) {
+                $config->{$key} = $value;
+            }
+        }
+        close($configfile);
+    }
+    $host = $config->{host} if $config->{host};
+    $port = $config->{port} if $config->{port};
+}
 
 # Override with options from the environment
 $host = $ENV{RMATE_HOST} if $ENV{RMATE_HOST};
