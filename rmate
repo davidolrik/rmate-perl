@@ -28,6 +28,10 @@ my $verbose        = 0;
 
 # TODO Read configuration from file
 
+# Override with options from the environment
+$host = $ENV{RMATE_HOST} if $ENV{RMATE_HOST};
+$port = $ENV{RMATE_PORT} if $ENV{RMATE_PORT};
+
 # Override with options from commandline
 GetOptions(
     'help'     => \$action_help,
