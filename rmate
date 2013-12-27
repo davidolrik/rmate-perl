@@ -67,7 +67,7 @@ if ( $action_version ) {
 
 # Get filename from args
 my $filename = shift @ARGV;
-die unless $filename;
+pod2usage(1) unless $filename;
 
 # Open socket
 my $socket = IO::Socket::INET->new(
