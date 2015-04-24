@@ -51,16 +51,16 @@ $port = $ENV{RMATE_PORT} if $ENV{RMATE_PORT};
 
 # Override with options from commandline
 GetOptions(
-    'help'     => \$action_help,
-    'man'      => \$action_man,
-    'version'  => \$action_version,
-    'host'     => \$host,
-    'port=i'   => \$port,
-    'force'    => \$force,
-    'wait!'    => \$wait,
-    'verbose+' => \$verbose,
+    'help'       => \$action_help,
+    'man'        => \$action_man,
+    'version'    => \$action_version,
+    'H|host'     => \$host,
+    'p|port=i'   => \$port,
+    'w|wait!'    => \$wait,
     'l|line=i'   => \$line,
     't|type=s'   => \$filetype,
+    'f|force'    => \$force,
+    'v|verbose+' => \$verbose,
     'n|new!'     => \$new_window,
 ) or pod2usage(2);
 pod2usage(1) if $action_help;
