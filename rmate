@@ -25,6 +25,7 @@ my $port           = 52698;
 my $force          = 0;
 my $wait           = 0;
 my $verbose        = 0;
+my $new_window     = 1;
 
 # Read configuration from file
 my $config = {};
@@ -56,6 +57,7 @@ GetOptions(
     'force'    => \$force,
     'wait!'    => \$wait,
     'verbose+' => \$verbose,
+    'n|new!'     => \$new_window,
 ) or pod2usage(2);
 pod2usage(1) if $action_help;
 pod2usage(-exitval => 0, -verbose => 2) if $action_man;
@@ -94,6 +96,9 @@ $socket->print("re-activate: yes\n");
 $socket->print("token: ${filename}\n");
 
 my $filetype;
+if ( $new_window ) {
+    $socket->print("new: yes\n");
+}
 if ( $filetype ) {
     $socket->print("file-type: ${filetype}\n");
 }
