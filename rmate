@@ -27,6 +27,7 @@ my $wait           = 0;
 my $verbose        = 0;
 my $new_window     = 1;
 my $line           = 0;
+my $filetype       = '';
 
 # Read configuration from file
 my $config = {};
@@ -59,6 +60,7 @@ GetOptions(
     'wait!'    => \$wait,
     'verbose+' => \$verbose,
     'l|line=i'   => \$line,
+    't|type=s'   => \$filetype,
     'n|new!'     => \$new_window,
 ) or pod2usage(2);
 pod2usage(1) if $action_help;
@@ -97,7 +99,6 @@ $socket->print("data-on-save: yes\n");
 $socket->print("re-activate: yes\n");
 $socket->print("token: ${filename}\n");
 
-my $filetype;
 if ( $new_window ) {
     $socket->print("new: yes\n");
 }
