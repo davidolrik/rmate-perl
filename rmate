@@ -26,6 +26,7 @@ my $force          = 0;
 my $wait           = 0;
 my $verbose        = 0;
 my $new_window     = 1;
+my $line           = 0;
 
 # Read configuration from file
 my $config = {};
@@ -57,6 +58,7 @@ GetOptions(
     'force'    => \$force,
     'wait!'    => \$wait,
     'verbose+' => \$verbose,
+    'l|line=i'   => \$line,
     'n|new!'     => \$new_window,
 ) or pod2usage(2);
 pod2usage(1) if $action_help;
@@ -98,6 +100,9 @@ $socket->print("token: ${filename}\n");
 my $filetype;
 if ( $new_window ) {
     $socket->print("new: yes\n");
+}
+if ( $line ) {
+    $socket->print("selection: ${line}\n");
 }
 if ( $filetype ) {
     $socket->print("file-type: ${filetype}\n");
