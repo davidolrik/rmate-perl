@@ -11,7 +11,7 @@ fi
 INSTALL_PATH=${INSTALL_PATH/\/+$//}
 
 # We use bash to install with
-BASH="/bin/bash -x"
+BASH="/bin/bash"
 
 # Use bash with sudo if installing outside users home directory
 if [[ "$INSTALL_PATH" != "$HOME"*  ]]; then
