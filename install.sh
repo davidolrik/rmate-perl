@@ -7,8 +7,11 @@ if [[ -z "${INSTALL_PATH}" ]]; then
     INSTALL_PATH="$HOME/bin"
 fi
 
+# Remove trailing slashes
+INSTALL_PATH=${INSTALL_PATH/\/+$//}
+
 # We use bash to install with
-BASH="/bin/bash"
+BASH="/bin/bash -x"
 
 # Use bash with sudo if installing outside users home directory
 if [[ "$INSTALL_PATH" != "$HOME"*  ]]; then
