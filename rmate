@@ -79,7 +79,7 @@ my $socket = IO::Socket::INET->new(
     PeerHost => $host,
     PeerPort => $port,
     Proto    => 'tcp',
-);
+) or die $!;
 
 # Read server into (which is always the first line)
 my $server_info = $socket->getline;
