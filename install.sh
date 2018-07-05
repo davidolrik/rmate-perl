@@ -21,7 +21,7 @@ fi
 echo "Installing rmate-perl into ${INSTALL_PATH}"
 $BASH -- <<INSTALLER
     mkdir -p "${INSTALL_PATH}"
-    curl -Lo "${INSTALL_PATH}/rmate" https://raw.github.com/xlr82xs/rmate-perl/master/rmate
+    curl -Lo "${INSTALL_PATH}/rmate" https://raw.github.com/davidolrik/rmate-perl/master/rmate
     chmod 755 "${INSTALL_PATH}/rmate"
     ln -sf "${INSTALL_PATH}/rmate" "${INSTALL_PATH}/mate"
     ln -sf "${INSTALL_PATH}/rmate" "${INSTALL_PATH}/rsub"
