@@ -6,7 +6,7 @@ This is a pure perl implementation of [rmate](https://github.com/textmate/rmate)
 
 Installing into `~/bin` can be done simply by executing this command:
 
-    curl -L https://raw.github.com/xlr82xs/rmate-perl/master/install.sh | bash
+    curl -L https://raw.github.com/davidolrik/rmate-perl/master/install.sh | bash
 
 If `~/bin` is not already in your `PATH` then you may want to add something like this to your shell startup file (e.g. `~/.profile`):
 
@@ -14,7 +14,7 @@ If `~/bin` is not already in your `PATH` then you may want to add something like
 
 Installing into any other directory can be done by supplying the path to `install.sh` like this:
 
-    curl -L https://raw.github.com/xlr82xs/rmate-perl/master/install.sh | bash /dev/stdin /usr/local/bin
+    curl -L https://raw.github.com/davidolrik/rmate-perl/master/install.sh | bash /dev/stdin /usr/local/bin
 
 If installing outside your home directory, `install.sh` will automatically use `sudo`.
 
